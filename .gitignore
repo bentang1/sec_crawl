@@ -1,0 +1,13 @@
+# Virtual environment
+.venv/
+
+# Runtime cache, checkpoint state, and output - not source
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor cruft
+.DS_Store
+.Rhistory

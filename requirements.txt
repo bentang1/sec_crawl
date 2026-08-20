@@ -1,0 +1,5 @@
+requests==2.34.2
+beautifulsoup4==4.15.0
+lxml==6.1.2
+tenacity==9.1.4
+pandas==3.0.5
