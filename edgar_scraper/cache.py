@@ -65,8 +65,23 @@ class FilingCache:
     def load_filing_document(self, cik10: str, accession_no_dashes: str, primary_document: str) -> bytes | None:
         path = self.filing_dir(cik10, accession_no_dashes) / primary_document
         if path.exists():
-            return path.read_bytes()
+            content = path.read_bytes()
+            # A zero-byte file is worse than an absent one: it reads as a cache
+            # hit, so the company fails extraction on every future run and never
+            # re-downloads. 34 of these were left behind by a disk-full event.
+            # Treating empty as a miss makes that self-healing.
+            if content:
+                return content
         return None
+
+    def save_document(
+        self, cik10: str, accession_no_dashes: str, filename: str, content: bytes, metadata: dict[str, Any]
+    ) -> Path:
+        """Writes a document and returns its path. Same layout as
+        `save_filing_document`, but returns where it landed so a caller that
+        indexes documents can record it."""
+        self.save_filing_document(cik10, accession_no_dashes, filename, content, metadata)
+        return self.filing_dir(cik10, accession_no_dashes) / filename
 
     def save_filing_document(
         self,
